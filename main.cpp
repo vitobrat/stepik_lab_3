@@ -31,6 +31,23 @@ int checkInput(){
     return input;
 }
 
+void clear() {
+    COORD topLeft  = { 0, 0 };
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO screen;
+    DWORD written;
+
+    GetConsoleScreenBufferInfo(console, &screen);
+    FillConsoleOutputCharacterA(
+            console, ' ', screen.dwSize.X * screen.dwSize.Y, topLeft, &written
+    );
+    FillConsoleOutputAttribute(
+            console, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
+            screen.dwSize.X * screen.dwSize.Y, topLeft, &written
+    );
+    SetConsoleCursorPosition(console, topLeft);
+}
+
 //выводит матрицу на экран
 void printMatrix(int *pointer,int N ,int *end){
     for (int *i = pointer, count = 1; i <= end; count++, i++){
@@ -121,10 +138,10 @@ void function1(int *pointer,int N, int *end){
             if(!flag){ break; }
 
         }
-    }else{
+    }else {
         function1(pointer, N, end);
     }
-    printMatrix(pointer, N, end);
+    printMatrix(pointer, N ,end);
 }
 //2.Получает новую матрицу, из матрицы п. 1, переставляя ее блоки в соответствии со схемами:
 void function2(int *pointer,int N, int *end){
@@ -280,6 +297,7 @@ int main() {
         for (int *i = arr[0]; i <= end; i++){
             *i = 0;
         }
+        clear();
         //1.Используя арифметику указателей, заполняет квадратичную целочисленную матрицу порядка N (6,8,10) случайными числами от 1 до  N*N согласно схемам, приведенным на рисунках.
         // Пользователь должен видеть процесс заполнения квадратичной матрицы.
         function1(pointer, N, end);
