@@ -9,9 +9,9 @@ void gotoXY(int x, int y)
 {
     COORD coord;
     coord.X = x;
-    coord.Y = y + 1;
+    coord.Y = y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-    this_thread::sleep_for(chrono::milliseconds(500));
+    this_thread::sleep_for(chrono::milliseconds(400));
 }
 
 
@@ -29,23 +29,6 @@ int checkInput(){
     cin.sync();
     cout << "\n";
     return input;
-}
-
-void clear() {
-    COORD topLeft  = { 0, 0 };
-    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO screen;
-    DWORD written;
-
-    GetConsoleScreenBufferInfo(console, &screen);
-    FillConsoleOutputCharacterA(
-            console, ' ', screen.dwSize.X * screen.dwSize.Y, topLeft, &written
-    );
-    FillConsoleOutputAttribute(
-            console, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
-            screen.dwSize.X * screen.dwSize.Y, topLeft, &written
-    );
-    SetConsoleCursorPosition(console, topLeft);
 }
 
 //выводит матрицу на экран
@@ -77,6 +60,24 @@ void quickSort(int *pointer, int N, int *end){
     if (start < end)
         quickSort(start, N, end);
 }
+//Создайте матрицу 3*3, заполните ее случайными числами (-30 до 30). Найдите определитель матрицы.
+void dopFunction(){
+    int N = 3;
+    int arr[N][N];
+    int *pointer = (int *) arr;
+    int *end = arr[0] + N * N - 1;
+    srand(time(NULL));
+    for (int *i = pointer; i <= end; i++){
+        *i = (rand() % 3) - 0;
+    }
+    printMatrix(pointer, N, end);
+    int resultP = (*pointer * *(pointer + 4) * *end) + (*(pointer + 1) * *(pointer + 5) * *(pointer + 6)) + (*(pointer + 3) * *(pointer + 7) * *(pointer + 2));
+    int resultM = -(*(pointer + 2) * *(pointer + 4) * *(pointer + 6)) - (*(pointer + 3) * *(pointer + 1) * *end) - (*(pointer + 7) * *(pointer + 5) * *pointer);
+    cout << "Determinant = " << (*pointer * *(pointer + 4) * *end) << " + " << (*(pointer + 1) * *(pointer + 5) * *(pointer + 6)) << " + "
+    << (*(pointer + 3) * *(pointer + 7) * *(pointer + 2)) << " + (" << -(*(pointer + 2) * *(pointer + 4) * *(pointer + 6)) << ") + ("
+    << -(*(pointer + 3)* *(pointer + 1) * *end) << ") + (" << - (*(pointer + 7) * *(pointer + 5) * *pointer) << ") = " << resultP + resultM << "\n";
+
+}
 
 //Используя арифметику указателей, заполняет квадратичную целочисленную матрицу порядка N (6,8,10) случайными числами от 1 до  N*N согласно схемам, приведенным на рисунках.
 // Пользователь должен видеть процесс заполнения квадратичной матрицы.
@@ -85,36 +86,41 @@ void function1(int *pointer,int N, int *end){
     cout << "Choose the type of matrix (a or b):";
     cin >> exercise;
     cin.sync();
+    system("cls");
     if (exercise == 'a'){
         int value = 1;
         for (int i = 0; i <= N / 2 - 1; i++){
             bool flag = false;
-            for (int *x = pointer + i * N + i, j = 0; x <= pointer + (i + 1) * N - i - 1; x++, j+=4){
+            for (int *x = pointer + i * N + i, j = i; x <= pointer + (i + 1) * N - i - 1; x++, j++){
                 *x = value++;
-//                gotoXY(j + i*4 , i);
-//                cout << *x;
+                gotoXY(j*4, i);
+                cout << *x;
                 flag = true;
             }
             if(!flag){ break; }
             flag = false;
-            for (int *y = pointer + (i + 2) * N - i - 1, j = 1; y <= end - i * N - i; y += N, j++){
+            for (int *y = pointer + (i + 2) * N - i - 1, j = i + 1; y <= end - i * N - i; y += N, j++){
                 *y = value++;
-//                gotoXY( (N - i - 1)*4, j);
-//                cout << *y;
+                gotoXY( (N - i - 1)*4, j);
+                cout << *y;
                 flag = true;
             }
             if(!flag){ break; }
 
             flag = false;
-            for (int *z = end - i * N - i - 1; z >= end - (i + 1) * N + i + 1; z--){
+            for (int *z = end - i * N - i - 1, j = N - i - 2; z >= end - (i + 1) * N + i + 1; z--, j--){
                 *z = value++;
+                gotoXY(j*4 , N - i - 1);
+                cout << *z;
                 flag = true;
             }
             if(!flag){ break; }
 
             flag = false;
-            for (int *w = end - (i + 2) * N + i + 1; w >= pointer + (i + 1) * N + i; w -= N){
+            for (int *w = end - (i + 2) * N + i + 1, j = N - 2 - i; w >= pointer + (i + 1) * N + i; w -= N, j--){
                 *w = value++;
+                gotoXY(i*4 , j);
+                cout << *w;
                 flag = true;
             }
             if(!flag){ break; }
@@ -124,15 +130,19 @@ void function1(int *pointer,int N, int *end){
         int value = 1;
         for (int i = 0; i <= N - 1; i++){
             bool flag = false;
-            for (int *j = pointer + i; j <= end - N + i + 1; j += N){
+            for (int *j = pointer + i, x = 0; j <= end - N + i + 1; j += N, x++){
                 *j = value++;
+                gotoXY(i*4, x);
+                cout << *j;
                 flag = true;
             }
             i++;
             if(!flag){ break; }
             flag = false;
-            for (int *z = end - N + i + 1; z >= pointer + i; z -= N){
+            for (int *z = end - N + i + 1, x = N - 1; z >= pointer + i; z -= N, x--){
                 *z = value++;
+                gotoXY(i*4, x);
+                cout << *z;
                 flag = true;
             }
             if(!flag){ break; }
@@ -141,7 +151,9 @@ void function1(int *pointer,int N, int *end){
     }else {
         function1(pointer, N, end);
     }
-    printMatrix(pointer, N ,end);
+    getchar();
+    system("cls");
+    printMatrix(pointer, N, end);
 }
 //2.Получает новую матрицу, из матрицы п. 1, переставляя ее блоки в соответствии со схемами:
 void function2(int *pointer,int N, int *end){
@@ -286,6 +298,7 @@ void function4(int *pointer, int N, int *end){
 }
 
 int main() {
+    dopFunction();
     int circle = 1;
     while (circle == 1){
         cout << "Set the matrix size(6,8,10):";
@@ -297,7 +310,6 @@ int main() {
         for (int *i = arr[0]; i <= end; i++){
             *i = 0;
         }
-        clear();
         //1.Используя арифметику указателей, заполняет квадратичную целочисленную матрицу порядка N (6,8,10) случайными числами от 1 до  N*N согласно схемам, приведенным на рисунках.
         // Пользователь должен видеть процесс заполнения квадратичной матрицы.
         function1(pointer, N, end);
