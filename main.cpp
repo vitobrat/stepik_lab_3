@@ -68,7 +68,7 @@ void dopFunction(){
     int *end = arr[0] + N * N - 1;
     srand(time(NULL));
     for (int *i = pointer; i <= end; i++){
-        *i = (rand() % 3) - 0;
+        *i = (rand() % 61) - 30;
     }
     printMatrix(pointer, N, end);
     int resultP = (*pointer * *(pointer + 4) * *end) + (*(pointer + 1) * *(pointer + 5) * *(pointer + 6)) + (*(pointer + 3) * *(pointer + 7) * *(pointer + 2));
